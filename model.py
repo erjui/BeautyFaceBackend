@@ -51,3 +51,39 @@ class SegmentModel(pl.LightningModule):
                 "monitor": "valid_loss",
             }
         }
+
+
+if __name__ == "__main__":
+    import cv2
+    import numpy as np
+    from torchvision.transforms import transforms
+
+    normalize = ((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(*normalize)
+    ])
+    
+    model = SegmentModel()
+
+    ckpt_path = "checkpoints/epoch=10-step=10999.ckpt"
+    model.load_from_checkpoint(ckpt_path)
+
+    img = cv2.imread("base64_sample/0.jpg")
+    img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_LINEAR)
+    img = transform(img).unsqueeze(0)
+
+    out = model(img).permute(1, 2, 0)
+    out = out.detach().cpu().numpy()
+    out = np.uint8(out)
+
+    print(out.shape)
+    print(out)
+
+    cv2.namedWindow("out", cv2.WINDOW_NORMAL)
+    cv2.imshow("out", out * 20)
+    cv2.waitKey(0)
+
+    print(img.shape)
+    print(out.shape)
+
