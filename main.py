@@ -1,10 +1,8 @@
 def inference(request):
-    import base64
-    import PIL.Image
-    import numpy as np
-    from io import BytesIO
-    import json
     import cv2
+    import json
+    import base64
+    import numpy as np
 
     """HTTP Cloud Function.
     Args:
@@ -28,47 +26,23 @@ def inference(request):
 
         return ('', 204, headers)
         
-
-    print('request', request)
-
     request_json = request.get_json(silent=True)
-    request_args = request.args
 
-    if request_json and 'name' in request_json:
-        name = request_json['name']
-    elif request_args and 'name' in request_args:
-        name = request_args['name']
-    else:
-        name = 'World'
-
-    print('name', name)
-    print('json', request_json)
-
-    cat = request_json['cat']
-    print('bf decoding', cat)
+    cat = request_json['data']
     cat = base64.b64decode(cat)
-    # cat = BytesIO(cat)
-    # img = PIL.Image.open(cat)
-    # img = np.array(img)
     img = np.frombuffer(cat, dtype=np.uint8)
     img = cv2.imdecode(img, cv2.IMREAD_COLOR)
 
-    print('img shape', img.shape)
-
-    # img_base64 = base64.b64encode(img)
     _, img_base64 = cv2.imencode('.jpg', img)
     img_base64 = img_base64.tobytes()
     img_base64 = base64.b64encode(img_base64)
-
-    print('af encoding', img_base64)
 
     # Set CORS headers for the main request
     headers = {
         'Access-Control-Allow-Origin': '*'
     }
 
-    # return img_base64, 
-    return (json.dumps({"cat": img_base64.decode('utf8')}), 200, headers)
+    return (json.dumps({"data": img_base64.decode('utf8')}), 200, headers)
 
 if __name__ == '__main__':
     pass
