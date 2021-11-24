@@ -1,19 +1,41 @@
-import os
-import torch
-import pytorch_lightning as pl
-import segmentation_models_pytorch as smp
+def inference(request):
+    import base64
+    import PIL.Image
+    import numpy as np
+    from io import BytesIO
 
-from model import SegmentModel
-model = SegmentModel()
+    """HTTP Cloud Function.
+    Args:
+        request (flask.Request): The request object.
+        <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+    print(request)
 
-ckpt_path = "checkpoints/epoch=10-step=10999.ckpt"
-model.load_from_checkpoint(ckpt_path)
+    request_json = request.get_json(silent=True)
+    request_args = request.args
 
-print(model)
+    if request_json and 'name' in request_json:
+        name = request_json['name']
+    elif request_args and 'name' in request_args:
+        name = request_args['name']
+    else:
+        name = 'World'
 
+    cat = request_json['cat']
+    cat = BytesIO(base64.b64decode(cat))
+    img = PIL.Image.open(cat)
+    img = np.array(img)
 
-def inference(event, context):
-    pass
+    print(img.shape)
+    print(name)
+
+    img_base64 = base64.b64encode(img)
+
+    return img_base64
 
 if __name__ == '__main__':
-    inference(None, None)
+    pass
