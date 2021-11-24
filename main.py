@@ -1,5 +1,7 @@
 def inference(request):
     import base64
+    import PIL.Image
+    import numpy as np
 
     """HTTP Cloud Function.
     Args:
