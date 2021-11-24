@@ -2,6 +2,7 @@ def inference(request):
     import base64
     import PIL.Image
     import numpy as np
+    from io import BytesIO
 
     """HTTP Cloud Function.
     Args:
@@ -23,10 +24,18 @@ def inference(request):
         name = request_args['name']
     else:
         name = 'World'
-        
+
+    cat = request_json['cat']
+    cat = BytesIO(base64.b64decode(cat))
+    img = PIL.Image.open(cat)
+    img = np.array(img)
+
+    print(img.shape)
     print(name)
 
-    return 'hello, world'
+    img_base64 = base64.b64encode(img)
+
+    return img_base64
 
 if __name__ == '__main__':
     pass
