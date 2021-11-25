@@ -1,0 +1,3 @@
+[submodule "BeautyFaceSegment"]
+	path = BeautyFaceSegment
+	url = https://github.com/EggPudding/BeautyFaceSegment.git
