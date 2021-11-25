@@ -3,21 +3,9 @@ def inference(request):
     import json
     import base64
     import numpy as np
-    import pytorch_lightning as pl
-
     from model import SegmentModel
     from torchvision.transforms import transforms
 
-
-    """HTTP Cloud Function.
-    Args:
-        request (flask.Request): The request object.
-        <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
-    Returns:
-        The response text, or any set of values that can be turned into a
-        Response object using `make_response`
-        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
-    """
     # Set CORS headers for the preflight request
     if request.method == 'OPTIONS':
         # Allows POST requests from any origin with the Content-Type
@@ -44,17 +32,12 @@ def inference(request):
         transforms.Normalize(*normalize)
     ])
 
-    print(img.shape)
-
     shape = img.shape
     img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_AREA)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-    print(img.shape)
-
     # model = SegmentModel.load_from_checkpoint('checkpoints/epoch=89-step=224999.ckpt')
     model = SegmentModel()
-
     print('pretrained model loaded')
 
     img = transform(img).unsqueeze(0)
