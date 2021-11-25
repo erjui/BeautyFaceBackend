@@ -11,8 +11,8 @@ class SegmentModel(pl.LightningModule):
         # self.save_hyperparameters()
 
         self.model = smp.FPN(
-            encoder_name='resnet34',
-            encoder_weights='imagenet',
+            encoder_name='timm-efficientnet-b4',
+            encoder_weights=None,
             in_channels=3,
             classes=19,
         )
