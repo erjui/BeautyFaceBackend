@@ -64,10 +64,10 @@ if __name__ == "__main__":
         transforms.Normalize(*normalize)
     ])
     
-    model = SegmentModel()
 
-    ckpt_path = "checkpoints/epoch=10-step=10999.ckpt"
-    model.load_from_checkpoint(ckpt_path)
+    ckpt_path = "checkpoints/epoch=89-step=224999.ckpt"
+    model = SegmentModel.load_from_checkpoint(ckpt_path)
+    print('pretrained model loaded')
 
     img = cv2.imread("base64_sample/0.jpg")
     img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_LINEAR)
