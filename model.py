@@ -70,7 +70,8 @@ if __name__ == "__main__":
     print('pretrained model loaded')
 
     img = cv2.imread("base64_sample/0.jpg")
-    img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_LINEAR)
+    img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_AREA)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = transform(img).unsqueeze(0)
 
     out = model(img).permute(1, 2, 0)
