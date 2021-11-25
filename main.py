@@ -3,6 +3,11 @@ def inference(request):
     import json
     import base64
     import numpy as np
+    import pytorch_lightning as pl
+
+    from model import SegmentModel
+    from torchvision.transforms import transforms
+
 
     """HTTP Cloud Function.
     Args:
@@ -33,7 +38,37 @@ def inference(request):
     img = np.frombuffer(cat, dtype=np.uint8)
     img = cv2.imdecode(img, cv2.IMREAD_COLOR)
 
-    _, img_base64 = cv2.imencode('.jpg', img)
+    normalize = ((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(*normalize)
+    ])
+
+    print(img.shape)
+
+    shape = img.shape
+    img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_AREA)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    print(img.shape)
+
+    # model = SegmentModel.load_from_checkpoint('checkpoints/epoch=89-step=224999.ckpt')
+    model = SegmentModel()
+
+    print('pretrained model loaded')
+
+    img = transform(img).unsqueeze(0)
+    out = model(img).permute(1, 2, 0)
+    out = out.detach().cpu().numpy()
+    out = np.uint8(out)
+    out = cv2.resize(out, (shape[1], shape[0]), interpolation=cv2.INTER_NEAREST)
+    out = out * 10
+
+    # TODO: add label colorization
+
+    print(out.shape)
+
+    _, img_base64 = cv2.imencode('.jpg', out)
     img_base64 = img_base64.tobytes()
     img_base64 = base64.b64encode(img_base64)
 
