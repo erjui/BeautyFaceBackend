@@ -2,7 +2,7 @@ import requests
 
 with open('base64_sample/1.txt', ) as f:
     value = f.read()
-    value = value[1:]
+    # value = value[1:]
 
 headers = {'Content-Type': 'application/json'}
 result = requests.post('http://192.168.0.81:8080/', json={'data': value}, headers=headers)
