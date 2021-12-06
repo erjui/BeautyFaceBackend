@@ -38,10 +38,10 @@ color_dict = {
     19: (119, 11, 32),
 }
 
-def labelVisualize(img, num_class=19, color_dict=color_dict):
+def label_visualize(img, num_classes=19, color_dict=color_dict):
     import numpy as np
     img = img[:,:,0] if len(img.shape) == 3 else img
     img_out = np.zeros(img.shape + (3,))
-    for i in range(num_class):
+    for i in range(num_classes):
         img_out[img == i,:] = color_dict[i]
     return img_out / 255

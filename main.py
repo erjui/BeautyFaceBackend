@@ -5,7 +5,7 @@ def inference(request):
     import numpy as np
     from model import SegmentModel
     from torchvision.transforms import transforms
-    from utils import labelVisualize
+    from utils import label_visualize
 
     # Set CORS headers for the preflight request
     if request.method == 'OPTIONS':
@@ -46,7 +46,7 @@ def inference(request):
     out = out.detach().cpu().numpy()
     out = np.uint8(out)
     out = cv2.resize(out, (shape[1], shape[0]), interpolation=cv2.INTER_NEAREST)
-    out = labelVisualize(out, 19)
+    out = label_visualize(out, 19)
 
     _, img_base64 = cv2.imencode('.jpg', out)
     img_base64 = img_base64.tobytes()
