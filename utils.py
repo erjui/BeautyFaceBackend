@@ -38,7 +38,7 @@ color_dict = {
     19: (119, 11, 32),
 }
 
-def labelVisualize(img, num_class, color_dict=color_dict):
+def labelVisualize(img, num_class=19, color_dict=color_dict):
     import numpy as np
     img = img[:,:,0] if len(img.shape) == 3 else img
     img_out = np.zeros(img.shape + (3,))
