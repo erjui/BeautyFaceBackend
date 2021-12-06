@@ -1,6 +1,6 @@
 import requests
 
-with open('base64_sample/cat.txt', ) as f:
+with open('base64_sample/1.txt', ) as f:
     value = f.read()
     value = value[1:]
 
