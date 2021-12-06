@@ -1,7 +1,18 @@
+# atts = [1 'skin', 2 'l_brow', 3 'r_brow', 4 'l_eye', 5 'r_eye', 6 'eye_g', 7 'l_ear', 8 'r_ear', 9 'ear_r',
+#         10 'nose', 11 'mouth', 12 'u_lip', 13 'l_lip', 14 'neck', 15 'neck_l', 16 'cloth', 17 'hair', 18 'hat']
+
+def lib_color_change(img, segment):
+    # RGB order
+    mask = (segment == 12) | (segment == 13)
+    img[..., 0][mask] += 50
+
+    return img
+
 def inference(request):
     import cv2
     import json
     import base64
+    import face_recognition
     import numpy as np
     from model import SegmentModel
     from torchvision.transforms import transforms
@@ -33,22 +44,45 @@ def inference(request):
         transforms.Normalize(*normalize)
     ])
 
-    shape = img.shape
-    img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_AREA)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    face_locations = face_recognition.face_locations(img)
+    face_location = face_locations[0]
+    top, right, bottom, left = face_location
 
-    # model = SegmentModel.load_from_checkpoint('checkpoints/epoch=89-step=224999.ckpt')
-    model = SegmentModel()
+    org_img = img.copy()
+    img = img[top:bottom, left:right]
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    img = cv2.resize(img, dsize=(512, 512), interpolation=cv2.INTER_CUBIC)
+
+    model = SegmentModel.load_from_checkpoint('checkpoints/epoch=84-step=148749.ckpt')
+    # model = SegmentModel()
+    model.eval()
+    model.cpu()
     print('pretrained model loaded')
 
-    img = transform(img).unsqueeze(0)
-    out = model(img).permute(1, 2, 0)
-    out = out.detach().cpu().numpy()
-    out = np.uint8(out)
-    out = cv2.resize(out, (shape[1], shape[0]), interpolation=cv2.INTER_NEAREST)
-    out = label_visualize(out, 19)
+    img_t = transform(img).unsqueeze(0)
+    out_t = model(img_t)
+    out = out_t[0].numpy()
 
-    _, img_base64 = cv2.imencode('.jpg', out)
+    out_v = label_visualize(out, 19)
+    out_v = np.uint8(out_v * 255.0)
+    img_result = lib_color_change(img.copy(), out)
+
+    # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
+    # cv2.imshow('img', np.hstack([img, out_v, img_result]))
+    # cv2.waitKey(0)
+
+    org_img = cv2.cvtColor(org_img, cv2.COLOR_BGR2RGB)
+    out_big = org_img.copy()
+    result_patch = cv2.resize(img_result, dsize=(right-left, bottom-top), interpolation=cv2.INTER_CUBIC)
+    out_big[top:bottom, left:right] = result_patch
+
+    # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
+    # cv2.imshow('img', np.hstack([org_img, out_big]))
+    # cv2.waitKey(0)
+
+    out_big = cv2.cvtColor(out_big, cv2.COLOR_RGB2BGR)
+
+    _, img_base64 = cv2.imencode('.jpg', out_big)
     img_base64 = img_base64.tobytes()
     img_base64 = base64.b64encode(img_base64)
 
