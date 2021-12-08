@@ -11,6 +11,9 @@ def inference(request):
     from utils import label_visualize
     import face_detection
 
+    import os
+    os.environ['CUDA_VISIBLE_DEVICES'] = ''
+
     def lib_color_change(img, segment):
         # RGB order
         img = np.int32(img)
@@ -50,6 +53,8 @@ def inference(request):
 
     print(face_detection.available_detectors)
     detector = face_detection.build_detector("RetinaNetMobileNetV1", confidence_threshold=.5, nms_iou_threshold=.3, device='cpu')
+    detector.net.eval()
+    detector.net.cpu()
     detections = detector.detect(img)
     detection = detections[0]
     xmin, ymin, xmax, ymax, conf = detection.astype(np.int32) 
