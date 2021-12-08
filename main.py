@@ -55,7 +55,6 @@ def inference(request):
     xmin, ymin, xmax, ymax, conf = detection.astype(np.int32) 
     top, right, bottom, left = ymin, xmax, ymax, xmin
 
-
     org_img = img.copy()
     img = img[top:bottom, left:right]
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
