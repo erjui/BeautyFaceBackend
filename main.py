@@ -5,11 +5,11 @@ def inference(request):
     import cv2
     import json
     import base64
-    import face_recognition
     import numpy as np
     from model import SegmentModel
     from torchvision.transforms import transforms
     from utils import label_visualize
+    import face_detection
 
     def lib_color_change(img, segment):
         # RGB order
@@ -48,9 +48,13 @@ def inference(request):
         transforms.Normalize(*normalize)
     ])
 
-    face_locations = face_recognition.face_locations(img)
-    face_location = face_locations[0]
-    top, right, bottom, left = face_location
+    print(face_detection.available_detectors)
+    detector = face_detection.build_detector("RetinaNetMobileNetV1", confidence_threshold=.5, nms_iou_threshold=.3)
+    detections = detector.detect(img)
+    detection = detections[0]
+    xmin, ymin, xmax, ymax, conf = detection.astype(np.int32) 
+    top, right, bottom, left = ymin, xmax, ymax, xmin
+
 
     org_img = img.copy()
     img = img[top:bottom, left:right]
