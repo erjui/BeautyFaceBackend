@@ -49,7 +49,7 @@ def inference(request):
     ])
 
     print(face_detection.available_detectors)
-    detector = face_detection.build_detector("RetinaNetMobileNetV1", confidence_threshold=.5, nms_iou_threshold=.3)
+    detector = face_detection.build_detector("RetinaNetMobileNetV1", confidence_threshold=.5, nms_iou_threshold=.3, device='cpu')
     detections = detector.detect(img)
     detection = detections[0]
     xmin, ymin, xmax, ymax, conf = detection.astype(np.int32) 
