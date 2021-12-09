@@ -15,3 +15,5 @@
 
 node_modules
 #!include:.gitignore
+
+!chekcpoints/epoch=84-step=148749.ckpt
