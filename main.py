@@ -95,7 +95,29 @@ def inference(request):
         return (json.dumps({"data": img_base64.decode('utf8'), "org": request_json['data']}), 200, headers)
 
     elif request_json['type'] == 'enhance':
-        pass
+        img = request_json['data']
+        img = base64.b64decode(img)
+        img = np.frombuffer(img, dtype=np.uint8)
+        img = cv2.imdecode(img, cv2.IMREAD_COLOR)
+
+        segment = request_json['segment']
+        segment = base64.b64decode(segment)
+        segment = np.frombuffer(segment, dtype=np.uint8)
+        segment = cv2.imdecode(segment, cv2.IMREAD_GRAYSCALE)
+
+        lib = request_json['lib']
+        img_result = lib_color_change(img.copy(), segment, lib)
+
+        _, img_base64 = cv2.imencode('.jpg', img_result)
+        img_base64 = img_base64.tobytes()
+        img_base64 = base64.b64encode(img_base64)
+
+        # Set CORS headers for the main request
+        headers = {
+            'Access-Control-Allow-Origin': '*'
+        }
+
+        return (json.dumps({"data": img_base64.decode('utf8')}), 200, headers)
 
 if __name__ == '__main__':
     pass
