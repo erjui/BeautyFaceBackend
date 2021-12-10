@@ -29,9 +29,9 @@ def inference(request):
     request_json = request.get_json(silent=True)
 
     if request_json['type'] == 'inference':
-        cat = request_json['data']
-        cat = base64.b64decode(cat)
-        img = np.frombuffer(cat, dtype=np.uint8)
+        img = request_json['data']
+        img = base64.b64decode(img)
+        img = np.frombuffer(img, dtype=np.uint8)
         img = cv2.imdecode(img, cv2.IMREAD_COLOR)
 
         normalize = ((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
