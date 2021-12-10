@@ -3,13 +3,15 @@
 
 import numpy as np
     
-def lib_color_change(img, segment):
+def lib_color_change(img, segment, value=[20, 0, 0]):
     # RGB order
     img = np.int32(img)
     
     mask = (segment == 12) | (segment == 13)
-    img[..., 0][mask] += 20
+    img[..., 0][mask] += value[0]
+    img[..., 1][mask] += value[1]
+    img[..., 2][mask] += value[2]
     img[img > 255] = 255
-    # img[..., 0][mask] = cv2.add(img[..., 0][mask], 100)
 
     return np.uint8(img)
+    
