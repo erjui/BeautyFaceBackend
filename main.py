@@ -87,12 +87,27 @@ def inference(request):
         img_base64 = img_base64.tobytes()
         img_base64 = base64.b64encode(img_base64)
 
+        segment = np.ones(out_big.shape[:2], dtype=np.uint8) * 255
+        print(segment.shape)
+        out = cv2.resize(out, dsize=(right-left, bottom-top), interpolation=cv2.INTER_NEAREST)
+        print(out.shape)
+        segment[top:bottom, left:right] = out
+        print(segment.shape)
+
+        # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
+        # cv2.imshow('img', segment)
+        # cv2.waitKey(0)
+
+        _, segment_base64 = cv2.imencode('.jpg', segment)
+        segment_base64 = segment_base64.tobytes()
+        segment_base64 = base64.b64encode(segment_base64)
+
         # Set CORS headers for the main request
         headers = {
             'Access-Control-Allow-Origin': '*'
         }
 
-        return (json.dumps({"data": img_base64.decode('utf8'), "org": request_json['data']}), 200, headers)
+        return (json.dumps({"data": img_base64.decode('utf8'), "org": request_json['data'], "segment": segment_base64.decode('utf8') }), 200, headers)
 
     elif request_json['type'] == 'enhance':
         img = request_json['data']
@@ -100,13 +115,33 @@ def inference(request):
         img = np.frombuffer(img, dtype=np.uint8)
         img = cv2.imdecode(img, cv2.IMREAD_COLOR)
 
+        # print('img loaded')
+        # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
+        # cv2.imshow('img', img)
+        # cv2.waitKey(0)
+
         segment = request_json['segment']
         segment = base64.b64decode(segment)
         segment = np.frombuffer(segment, dtype=np.uint8)
         segment = cv2.imdecode(segment, cv2.IMREAD_GRAYSCALE)
 
+        # print('segment loaded')
+        # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
+        # cv2.imshow('img', segment)
+        # cv2.waitKey(0)
+    
         lib = request_json['lib']
+        lib.reverse()
         img_result = lib_color_change(img.copy(), segment, lib)
+
+        print(segment.shape)
+        print(img_result.shape)
+        print('lib', lib)
+        print('lib changed')
+        # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
+        # cv2.imshow('img', img_result)
+        # cv2.waitKey(0)
+
 
         _, img_base64 = cv2.imencode('.jpg', img_result)
         img_base64 = img_base64.tobytes()
