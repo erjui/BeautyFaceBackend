@@ -12,6 +12,7 @@ def lib_color_change(img, segment, value=[20, 0, 0]):
     img[..., 1][mask] += value[1]
     img[..., 2][mask] += value[2]
     img[img > 255] = 255
+    img[img < 0] = 0
 
     return np.uint8(img)
     
