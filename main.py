@@ -158,6 +158,7 @@ def inference(request):
         }
 
         return (json.dumps({"data": img_base64.decode('utf8')}), 200, headers)
+        # return (json.dumps({"data": img_base64.decode('utf8'), "org": request_json['data']}), 200, headers)
 
 if __name__ == '__main__':
     pass

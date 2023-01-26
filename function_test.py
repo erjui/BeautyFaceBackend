@@ -4,8 +4,12 @@ with open('base64_sample/1.txt', ) as f:
     value = f.read()
     # value = value[1:]
 
+with open('base64_sample/segment.txt', ) as f:
+    segment = f.read()
+
 headers = {'Content-Type': 'application/json'}
-result = requests.post('http://192.168.0.81:8080/', json={'data': value}, headers=headers)
+# result = requests.post('http://192.168.0.81:8080/', json={'type': 'inference', 'data': value}, headers=headers)
+result = requests.post('http://192.168.0.81:8080/', json={'type': 'enhance', 'segment': segment, 'lib': [255, 0, 0], 'data': value}, headers=headers)
 output = result.json()
 
 import cv2
