@@ -21,7 +21,8 @@ org = cv2.imdecode(org, cv2.IMREAD_COLOR)
 
 from utils import label_visualize
 
-cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+# cv2.namedWindow('image', cv2.WINDOW_NORMAL)
 # cv2.imshow('image', np.hstack([org, np.uint8(label_visualize(img) * 255.0)]))
-cv2.imshow('image', np.hstack([org, img]))
-cv2.waitKey(0)
+# cv2.imshow('image', np.hstack([org, img]))
+cv2.imwrite('image.jpg', np.hstack([org, img]))
+# cv2.waitKey(0)

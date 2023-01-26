@@ -71,6 +71,7 @@ def inference(request):
         # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
         # cv2.imshow('img', np.hstack([img, out_v, img_result]))
         # cv2.waitKey(0)
+        cv2.imwrite('0_result.jpg', np.hstack([img, out_v, img_result])[:, :, ::-1])
 
         org_img = cv2.cvtColor(org_img, cv2.COLOR_BGR2RGB)
         out_big = org_img.copy()
@@ -80,6 +81,7 @@ def inference(request):
         # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
         # cv2.imshow('img', np.hstack([org_img, out_big]))
         # cv2.waitKey(0)
+        cv2.imwrite('1_result_big.jpg', np.hstack([org_img, out_big])[:, :, ::-1])
 
         out_big = cv2.cvtColor(out_big, cv2.COLOR_RGB2BGR)
 
@@ -88,15 +90,16 @@ def inference(request):
         img_base64 = base64.b64encode(img_base64)
 
         segment = np.ones(out_big.shape[:2], dtype=np.uint8) * 255
-        print(segment.shape)
+        # print(segment.shape)
         out = cv2.resize(out, dsize=(right-left, bottom-top), interpolation=cv2.INTER_NEAREST)
-        print(out.shape)
+        # print(out.shape)
         segment[top:bottom, left:right] = out
-        print(segment.shape)
+        # print(segment.shape)
 
         # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
         # cv2.imshow('img', segment)
         # cv2.waitKey(0)
+        cv2.imwrite('2_segment.jpg', segment)
 
         _, segment_base64 = cv2.imencode('.jpg', segment)
         segment_base64 = segment_base64.tobytes()
@@ -119,6 +122,7 @@ def inference(request):
         # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
         # cv2.imshow('img', img)
         # cv2.waitKey(0)
+        cv2.imwrite('0_org.jpg', img)
 
         segment = request_json['segment']
         segment = base64.b64decode(segment)
@@ -129,19 +133,20 @@ def inference(request):
         # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
         # cv2.imshow('img', segment)
         # cv2.waitKey(0)
+        cv2.imwrite('1_segment.jpg', segment)
     
         lib = request_json['lib']
         lib.reverse()
         img_result = lib_color_change(img.copy(), segment, lib)
 
-        print(segment.shape)
-        print(img_result.shape)
-        print('lib', lib)
-        print('lib changed')
+        # print(segment.shape)
+        # print(img_result.shape)
+        # print('lib', lib)
+        # print('lib changed')
         # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
         # cv2.imshow('img', img_result)
         # cv2.waitKey(0)
-
+        cv2.imwrite('2_result.jpg', img_result)
 
         _, img_base64 = cv2.imencode('.jpg', img_result)
         img_base64 = img_base64.tobytes()
