@@ -54,7 +54,7 @@ def inference(request):
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         img = cv2.resize(img, dsize=(512, 512), interpolation=cv2.INTER_CUBIC)
 
-        model = SegmentModel.load_from_checkpoint('checkpoints/epoch=84-step=148749.ckpt')
+        model = SegmentModel.load_from_checkpoint('checkpoints/epoch=85-step=64500.ckpt')
         # model = SegmentModel()
         model.eval()
         model.cpu()
