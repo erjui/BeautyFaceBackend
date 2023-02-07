@@ -79,7 +79,7 @@ def inference(request):
 
         out_big = cv2.cvtColor(out_big, cv2.COLOR_RGB2BGR)
 
-        _, img_base64 = cv2.imencode('.jpg', out_big)
+        _, img_base64 = cv2.imencode('.png', out_big)
         img_base64 = img_base64.tobytes()
         img_base64 = base64.b64encode(img_base64)
 
@@ -89,7 +89,8 @@ def inference(request):
 
         cv2.imwrite('debug_inference/2_segment.jpg', np.uint8(label_visualize(segment, 19) * 255.0))
 
-        _, segment_base64 = cv2.imencode('.jpg', segment)
+        # REMIND. jpg compression yeild bad results
+        _, segment_base64 = cv2.imencode('.png', segment)
         segment_base64 = segment_base64.tobytes()
         segment_base64 = base64.b64encode(segment_base64)
 
@@ -122,7 +123,7 @@ def inference(request):
 
         cv2.imwrite('debug_enhance/2_result.jpg', img_result)
 
-        _, img_base64 = cv2.imencode('.jpg', img_result)
+        _, img_base64 = cv2.imencode('.png', img_result)
         img_base64 = img_base64.tobytes()
         img_base64 = base64.b64encode(img_base64)
 
