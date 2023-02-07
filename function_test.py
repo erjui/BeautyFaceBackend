@@ -26,14 +26,10 @@ segment = base64.b64decode(output['segment'])
 segment = np.frombuffer(segment, dtype=np.uint8)
 segment = cv2.imdecode(segment, cv2.IMREAD_GRAYSCALE)
 
-print(segment.shape)
-breakpoint()
-
 from utils import label_visualize
 
 cv2.imwrite('debug_function_test/0_image.jpg', np.hstack([org, img]))
 cv2.imwrite('debug_function_test/1_segment.jpg', np.uint8(label_visualize(segment, 19) * 255.0))
-cv2.imwrite('debug_function_test/2_segment.jpg', segment)
 
 # STEP 2. Enhance Test
 segment = output['segment']

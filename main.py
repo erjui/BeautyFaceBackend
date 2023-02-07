@@ -115,7 +115,7 @@ def inference(request):
         segment = np.frombuffer(segment, dtype=np.uint8)
         segment = cv2.imdecode(segment, cv2.IMREAD_GRAYSCALE)
 
-        cv2.imwrite('debug_enhance/1_segment.jpg', segment)
+        cv2.imwrite('debug_enhance/1_segment.jpg', np.uint8(label_visualize(segment, 19) * 255.0))
     
         lib = request_json['lib']
         lib.reverse()
