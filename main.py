@@ -1,18 +1,31 @@
+import cv2
+import json
+import base64
+import numpy as np
+from model import SegmentModel
+from torchvision.transforms import transforms
+from utils import label_visualize
+import face_detection
+
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = ''
+
+from img_process import lib_color_change
+
+# STEP. Load pretrained model 
+print(face_detection.available_detectors)
+detector = face_detection.build_detector("RetinaNetMobileNetV1", confidence_threshold=.5, nms_iou_threshold=.3, device='cpu')
+detector.net.eval()
+detector.net.cpu()
+print(f"Face detection model loaded.")
+
+# model = SegmentModel()
+model = SegmentModel.load_from_checkpoint('checkpoints/epoch=85-step=64500.ckpt')
+model.eval()
+model.cpu()
+print(f"Segmentation model loaded.")
+
 def inference(request):
-    import cv2
-    import json
-    import base64
-    import numpy as np
-    from model import SegmentModel
-    from torchvision.transforms import transforms
-    from utils import label_visualize
-    import face_detection
-
-    import os
-    os.environ['CUDA_VISIBLE_DEVICES'] = ''
-
-    from img_process import lib_color_change
-
     # Set CORS headers for the preflight request
     if request.method == 'OPTIONS':
         # Allows POST requests from any origin with the Content-Type
@@ -40,10 +53,6 @@ def inference(request):
             transforms.Normalize(*normalize)
         ])
 
-        print(face_detection.available_detectors)
-        detector = face_detection.build_detector("RetinaNetMobileNetV1", confidence_threshold=.5, nms_iou_threshold=.3, device='cpu')
-        detector.net.eval()
-        detector.net.cpu()
         detections = detector.detect(img)
         detection = detections[0]
         xmin, ymin, xmax, ymax, conf = detection.astype(np.int32) 
@@ -53,12 +62,6 @@ def inference(request):
         img = img[top:bottom, left:right]
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         img = cv2.resize(img, dsize=(512, 512), interpolation=cv2.INTER_CUBIC)
-
-        model = SegmentModel.load_from_checkpoint('checkpoints/epoch=85-step=64500.ckpt')
-        # model = SegmentModel()
-        model.eval()
-        model.cpu()
-        print('pretrained model loaded')
 
         img_t = transform(img).unsqueeze(0)
         out_t = model(img_t)
