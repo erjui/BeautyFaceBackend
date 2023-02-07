@@ -99,8 +99,7 @@ def inference(request):
             'Access-Control-Allow-Origin': '*'
         }
 
-        # TODO: remove org return for efficiency
-        return (json.dumps({"data": img_base64.decode('utf8'), "org": request_json['data'], "segment": segment_base64.decode('utf8') }), 200, headers)
+        return (json.dumps({"data": img_base64.decode('utf8'), "segment": segment_base64.decode('utf8') }), 200, headers)
 
     elif request_json['type'] == 'enhance':
         img = request_json['data']

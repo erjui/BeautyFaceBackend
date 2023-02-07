@@ -18,7 +18,7 @@ img = base64.b64decode(output['data'])
 img = np.frombuffer(img, dtype=np.uint8)
 img = cv2.imdecode(img, cv2.IMREAD_COLOR)
 
-org = base64.b64decode(output['org'])
+org = base64.b64decode(value)
 org = np.frombuffer(org, dtype=np.uint8)
 org = cv2.imdecode(org, cv2.IMREAD_COLOR)
 
