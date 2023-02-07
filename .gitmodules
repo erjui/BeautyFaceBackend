@@ -1,3 +1,0 @@
-[submodule "DSFD-Pytorch-Inference"]
-	path = DSFD-Pytorch-Inference
-	url = https://github.com/hukkelas/DSFD-Pytorch-Inference.git

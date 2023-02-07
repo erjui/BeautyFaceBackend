@@ -2,10 +2,13 @@ import requests
 
 with open('base64_sample/1.txt', ) as f:
     value = f.read()
-    # value = value[1:]
 
+# with open('base64_sample/segment.txt', ) as f:
+#     segment = f.read()
+
+# STEP 1. Inference Test
 headers = {'Content-Type': 'application/json'}
-result = requests.post('http://192.168.0.81:8080/', json={'data': value}, headers=headers)
+result = requests.post('http://127.0.0.1:8080/', json={'type': 'inference', 'data': value}, headers=headers)
 output = result.json()
 
 import cv2
@@ -19,9 +22,20 @@ org = base64.b64decode(output['org'])
 org = np.frombuffer(org, dtype=np.uint8)
 org = cv2.imdecode(org, cv2.IMREAD_COLOR)
 
+segment = base64.b64decode(output['segment'])
+segment = np.frombuffer(segment, dtype=np.uint8)
+segment = cv2.imdecode(segment, cv2.IMREAD_GRAYSCALE)
+
+print(segment.shape)
+breakpoint()
+
 from utils import label_visualize
 
-cv2.namedWindow('image', cv2.WINDOW_NORMAL)
-# cv2.imshow('image', np.hstack([org, np.uint8(label_visualize(img) * 255.0)]))
-cv2.imshow('image', np.hstack([org, img]))
-cv2.waitKey(0)
+cv2.imwrite('debug_function_test/0_image.jpg', np.hstack([org, img]))
+cv2.imwrite('debug_function_test/1_segment.jpg', np.uint8(label_visualize(segment, 19) * 255.0))
+cv2.imwrite('debug_function_test/2_segment.jpg', segment)
+
+# STEP 2. Enhance Test
+segment = output['segment']
+result = requests.post('http://127.0.0.1:8080/', json={'type': 'enhance', 'segment': segment, 'lib': [255, 255, 255], 'data': value}, headers=headers)
+output = result.json()

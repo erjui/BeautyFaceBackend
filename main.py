@@ -54,7 +54,7 @@ def inference(request):
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         img = cv2.resize(img, dsize=(512, 512), interpolation=cv2.INTER_CUBIC)
 
-        model = SegmentModel.load_from_checkpoint('checkpoints/epoch=84-step=148749.ckpt')
+        model = SegmentModel.load_from_checkpoint('checkpoints/epoch=85-step=64500.ckpt')
         # model = SegmentModel()
         model.eval()
         model.cpu()
@@ -68,37 +68,29 @@ def inference(request):
         out_v = np.uint8(out_v * 255.0)
         img_result = lib_color_change(img.copy(), out)
 
-        # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
-        # cv2.imshow('img', np.hstack([img, out_v, img_result]))
-        # cv2.waitKey(0)
+        cv2.imwrite('debug_inference/0_result.jpg', np.hstack([img, out_v, img_result])[:, :, ::-1])
 
         org_img = cv2.cvtColor(org_img, cv2.COLOR_BGR2RGB)
         out_big = org_img.copy()
         result_patch = cv2.resize(img_result, dsize=(right-left, bottom-top), interpolation=cv2.INTER_CUBIC)
         out_big[top:bottom, left:right] = result_patch
 
-        # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
-        # cv2.imshow('img', np.hstack([org_img, out_big]))
-        # cv2.waitKey(0)
+        cv2.imwrite('debug_inference/1_result_big.jpg', np.hstack([org_img, out_big])[:, :, ::-1])
 
         out_big = cv2.cvtColor(out_big, cv2.COLOR_RGB2BGR)
 
-        _, img_base64 = cv2.imencode('.jpg', out_big)
+        _, img_base64 = cv2.imencode('.png', out_big)
         img_base64 = img_base64.tobytes()
         img_base64 = base64.b64encode(img_base64)
 
         segment = np.ones(out_big.shape[:2], dtype=np.uint8) * 255
-        print(segment.shape)
         out = cv2.resize(out, dsize=(right-left, bottom-top), interpolation=cv2.INTER_NEAREST)
-        print(out.shape)
         segment[top:bottom, left:right] = out
-        print(segment.shape)
 
-        # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
-        # cv2.imshow('img', segment)
-        # cv2.waitKey(0)
+        cv2.imwrite('debug_inference/2_segment.jpg', np.uint8(label_visualize(segment, 19) * 255.0))
 
-        _, segment_base64 = cv2.imencode('.jpg', segment)
+        # REMIND. jpg compression yeild bad results
+        _, segment_base64 = cv2.imencode('.png', segment)
         segment_base64 = segment_base64.tobytes()
         segment_base64 = base64.b64encode(segment_base64)
 
@@ -107,6 +99,7 @@ def inference(request):
             'Access-Control-Allow-Origin': '*'
         }
 
+        # TODO: remove org return for efficiency
         return (json.dumps({"data": img_base64.decode('utf8'), "org": request_json['data'], "segment": segment_base64.decode('utf8') }), 200, headers)
 
     elif request_json['type'] == 'enhance':
@@ -115,35 +108,22 @@ def inference(request):
         img = np.frombuffer(img, dtype=np.uint8)
         img = cv2.imdecode(img, cv2.IMREAD_COLOR)
 
-        # print('img loaded')
-        # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
-        # cv2.imshow('img', img)
-        # cv2.waitKey(0)
+        cv2.imwrite('debug_enhance/0_org.jpg', img)
 
         segment = request_json['segment']
         segment = base64.b64decode(segment)
         segment = np.frombuffer(segment, dtype=np.uint8)
         segment = cv2.imdecode(segment, cv2.IMREAD_GRAYSCALE)
 
-        # print('segment loaded')
-        # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
-        # cv2.imshow('img', segment)
-        # cv2.waitKey(0)
+        cv2.imwrite('debug_enhance/1_segment.jpg', segment)
     
         lib = request_json['lib']
         lib.reverse()
         img_result = lib_color_change(img.copy(), segment, lib)
 
-        print(segment.shape)
-        print(img_result.shape)
-        print('lib', lib)
-        print('lib changed')
-        # cv2.namedWindow('img', cv2.WINDOW_NORMAL)
-        # cv2.imshow('img', img_result)
-        # cv2.waitKey(0)
+        cv2.imwrite('debug_enhance/2_result.jpg', img_result)
 
-
-        _, img_base64 = cv2.imencode('.jpg', img_result)
+        _, img_base64 = cv2.imencode('.png', img_result)
         img_base64 = img_base64.tobytes()
         img_base64 = base64.b64encode(img_base64)
 
