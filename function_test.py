@@ -50,3 +50,8 @@ result = requests.post('http://127.0.0.1:8080/', json={'type': 'enhance_eye', 's
 segment = output['segment']
 result = requests.post('http://127.0.0.1:8080/', json={'type': 'enhance_nose', 'segment': segment, 'value': [10, 10, 10], 'data': value}, headers=headers)
 # output = result.json()
+
+# STEP 6. Enhance Brow Test
+segment = output['segment']
+result = requests.post('http://127.0.0.1:8080/', json={'type': 'enhance_brow', 'segment': segment, 'value': [0, 30, 0], 'data': value}, headers=headers)
+# output = result.json()
