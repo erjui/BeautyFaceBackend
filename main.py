@@ -58,6 +58,12 @@ def inference(request):
         xmin, ymin, xmax, ymax, conf = detection.astype(np.int32)
         top, right, bottom, left = ymin, xmax, ymax, xmin
 
+        # Emprical resizing face size
+        top = max(top - int((bottom - top) * 0.2), 0)
+        bottom = min(bottom + int((bottom - top) * 0.2), img.shape[0])
+        left = max(left - int((right - left) * 0.2), 0)
+        right = min(right + int((right - left) * 0.2), img.shape[1])
+
         org_img = img.copy()
         img = img[top:bottom, left:right]
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
