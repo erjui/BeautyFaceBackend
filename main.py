@@ -25,6 +25,8 @@ model.eval()
 model.cpu()
 print(f"Segmentation model loaded.")
 
+# TODO: refactor enhance functions
+
 def inference(request):
     # Set CORS headers for the preflight request
     if request.method == 'OPTIONS':

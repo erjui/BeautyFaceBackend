@@ -36,7 +36,7 @@ segment = output['segment']
 result = requests.post('http://127.0.0.1:8080/', json={'type': 'enhance_lib', 'segment': segment, 'value': [10, 0, 0], 'data': value}, headers=headers)
 # output = result.json()
 
-# STEP 3.Enhance Skin Test
+# STEP 3. Enhance Skin Test
 segment = output['segment']
 result = requests.post('http://127.0.0.1:8080/', json={'type': 'enhance_skin', 'segment': segment, 'value': [10, 0, 0], 'data': value}, headers=headers)
 # output = result.json()
