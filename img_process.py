@@ -29,6 +29,19 @@ def eye_color_change(img, segment, value=[20, 0, 0]):
 
     return np.uint8(img)
 
+def nose_color_change(img, segment, value=[20, 0, 0]):
+    # RGB order
+    img = np.int32(img)
+
+    mask = (segment == 10)
+    img[..., 0][mask] += value[0]
+    img[..., 1][mask] += value[1]
+    img[..., 2][mask] += value[2]
+    img[img > 255] = 255
+    img[img < 0] = 0
+
+    return np.uint8(img)
+
 def skin_color_change(img, segment, value=[20, 0, 0]):
     # RGB order
     img = np.int32(img)

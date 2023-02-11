@@ -41,7 +41,12 @@ segment = output['segment']
 result = requests.post('http://127.0.0.1:8080/', json={'type': 'enhance_skin', 'segment': segment, 'value': [10, 0, 0], 'data': value}, headers=headers)
 # output = result.json()
 
-# STEP 3.Enhance Eye Test
+# STEP 4.Enhance Eye Test
 segment = output['segment']
 result = requests.post('http://127.0.0.1:8080/', json={'type': 'enhance_eye', 'segment': segment, 'value': [10, 0, 30], 'data': value}, headers=headers)
+# output = result.json()
+
+# STEP 5. Enhance Nose Test
+segment = output['segment']
+result = requests.post('http://127.0.0.1:8080/', json={'type': 'enhance_nose', 'segment': segment, 'value': [10, 50, 30], 'data': value}, headers=headers)
 # output = result.json()

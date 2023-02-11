@@ -10,7 +10,7 @@ import face_detection
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-from img_process import lib_color_change, skin_color_change, eye_color_change
+from img_process import lib_color_change, skin_color_change, eye_color_change, nose_color_change
 
 # STEP. Load pretrained model
 print(face_detection.available_detectors)
@@ -188,6 +188,38 @@ def inference(request):
         img_result = eye_color_change(img.copy(), segment, value)
 
         cv2.imwrite('debug_enhance_eye/2_result.jpg', img_result)
+
+        _, img_base64 = cv2.imencode('.png', img_result)
+        img_base64 = img_base64.tobytes()
+        img_base64 = base64.b64encode(img_base64)
+
+        # Set CORS headers for the main request
+        headers = {
+            'Access-Control-Allow-Origin': '*'
+        }
+
+        return (json.dumps({"data": img_base64.decode('utf8')}), 200, headers)
+
+    elif request_json['type'] == 'enhance_nose':
+        img = request_json['data']
+        img = base64.b64decode(img)
+        img = np.frombuffer(img, dtype=np.uint8)
+        img = cv2.imdecode(img, cv2.IMREAD_COLOR)
+
+        cv2.imwrite('debug_enhance_nose/0_org.jpg', img)
+
+        segment = request_json['segment']
+        segment = base64.b64decode(segment)
+        segment = np.frombuffer(segment, dtype=np.uint8)
+        segment = cv2.imdecode(segment, cv2.IMREAD_GRAYSCALE)
+
+        cv2.imwrite('debug_enhance_nose/1_segment.jpg', np.uint8(label_visualize(segment, 19) * 255.0))
+
+        value = request_json['value']
+        value.reverse()
+        img_result = nose_color_change(img.copy(), segment, value)
+
+        cv2.imwrite('debug_enhance_nose/2_result.jpg', img_result)
 
         _, img_base64 = cv2.imencode('.png', img_result)
         img_base64 = img_base64.tobytes()
